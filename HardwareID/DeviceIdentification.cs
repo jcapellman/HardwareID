@@ -29,6 +29,20 @@ namespace HardwareID
             return output.Replace("UUID", string.Empty).Trim().ToUpper();
         }
 
+        // This is a path forward, but system_profiler is slow and since this is being called on registration this would cause a bad UX as is
+        private static string GetMacOSID() {
+            var terminalPath = "/System/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal";
+            
+            // Fallback for older versions of macOS
+            if (!System.IO.File.Exists(terminalPath)) {
+                terminalPath = "/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal";
+            }
+            
+            var output = ExecProcess(terminalPath, "system_profiler | grep "\Hardware UUID:\"");
+            
+            return output.Replace("Hardware UUID:", string.Empty).Trim().ToUpper();
+        }
+        
         public static string UniqueID
         {
             get
